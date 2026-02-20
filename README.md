@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+oasis oasis is a web application designed to provide music sheets, formation materials, and integration tools for people involved in church life. Its purpose is to make resources easy to access, support community growth, and help teams collaborate more effectively.
 
-## Getting Started
+The app is built around three core modules:
 
-First, run the development server:
+🎼 Sheets A dedicated space for music sheets, arrangements, and song resources. It helps musicians and leaders quickly find, organize, and use the materials they need for rehearsals, liturgy, or worship events.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+📚 Materials A collection of documents, notes, presentations, and formation content. This module supports spiritual development, meeting preparation, and ongoing education within the community.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🤝 Integration A module focused on bringing people together. It provides tools that help with communication, coordination, and building relationships inside the church environment.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+🎯 Purpose oasis aims to:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+centralize and organize important resources,
 
-## Learn More
+simplify access to music and formation materials,
 
-To learn more about Next.js, take a look at the following resources:
+support collaboration and integration within the community,
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+help teams prepare for liturgy, meetings, and events.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+🛠️ Tech Stack (adjust as needed)
 
-## Deploy on Vercel
+Next.js
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+TypeScript
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Tailwind CSS
+
+shadcn/ui
+
+🚀 Project Status oasis is under active development. New features and improvements will be added as the needs of the community grow.
