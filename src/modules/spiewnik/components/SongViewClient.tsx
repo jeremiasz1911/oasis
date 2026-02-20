@@ -512,7 +512,7 @@ export default function SongViewClient({ songId }: { songId: string }) {
                 : "" 
             /* separator on mobile */
             }
-      <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+      <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between">
         <div className="flex flex-wrap items-center gap-2 justify-start w-full md:w-auto">
           <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setFontStep((v) => clamp(v - 1, -6, 10))}>
             A-

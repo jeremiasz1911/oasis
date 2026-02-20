@@ -4,6 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, Music, Users, FileText, Home, UserCog, LogInIcon } from "lucide-react";
 import Image from "next/image";
+import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
+
 
 import { routes } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -20,6 +23,8 @@ const navItems = [
 
 export default function AppNav() {
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur">
@@ -74,12 +79,16 @@ export default function AppNav() {
             );
             })}
         </nav>
-
-        <Button asChild variant="ghost" size="icon" aria-label="Zaloguj">
+        
+        <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={toggleTheme} title="Przełącz motyw">
+          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
+        <Button asChild variant="outline" size="icon" aria-label="Zaloguj">
             <Link href="/admin/login">
                 <UserCog className="h-5 w-5" />
             </Link>
         </Button>
+       
         </div>
 
         {/* Mobile menu */}
