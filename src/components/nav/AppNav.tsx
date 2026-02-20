@@ -29,10 +29,10 @@ export default function AppNav() {
           <Image
                     src="/assets/logo3.png"
                     alt="Logo"
-                    width={30}
+                    width={56}
                     height={30}
                     priority
-                    className=""
+                    className="bg-white/90 rounded-md border-0"
                 />
             <Image
                     src="/assets/logo2.png"
@@ -40,7 +40,7 @@ export default function AppNav() {
                     width={230}
                     height={230}
                     priority
-                    className=""
+                    className="bg-white/90 rounded-md border-0"
                 />    
         </Link>
 

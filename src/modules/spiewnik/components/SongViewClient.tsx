@@ -447,11 +447,105 @@ export default function SongViewClient({ songId }: { songId: string }) {
 
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
+  const TransposeControls = canChordModes ? (
+    <div className="flex flex-wrap items-center gap-2 justify-between w-full md:w-auto">
+      <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setTranspose((t) => Math.max(-12, t - 1))}>
+        -1
+      </Button>
+      <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setTranspose((t) => Math.min(12, t + 1))}>
+        +1
+      </Button>
+      <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setTranspose(0)} disabled={transpose === 0}>
+        Reset
+      </Button>
+      <Badge variant="outline" className="ml-1">
+        {transpose === 0 ? "Transpozycja: 0" : `Transpozycja: ${transpose > 0 ? "+" : ""}${transpose}`}
+      </Badge>
+    </div>
+  ) : null;
+
+  const AppearanceControls = canChordModes ? (
+    <div className="flex flex-wrap items-center gap-2 justify-between w-full md:w-auto pb-4">
+      <Button
+        variant={chordLayout === "above" ? "default" : "outline"}
+        className="opacity-90 hover:opacity-100"
+        onClick={() => setChordLayout("above")}
+        title="Akordy nad tekstem"
+      >
+        <ArrowUpDown className="h-4 w-4" />
+      </Button>
+      <Button
+        variant={chordLayout === "inline" ? "default" : "outline"}
+        className="opacity-90 hover:opacity-100"
+        onClick={() => setChordLayout("inline")}
+        title="Akordy w tekście"
+      >
+        <Music className="h-4 w-4" />
+      </Button>
+
+      <div className="mx-2 h-6 w-px bg-border" />
+
+      <div className="flex items-center gap-2">
+        <Paintbrush className="h-4 w-4 text-muted-foreground" />
+        <div className="text-sm text-muted-foreground">Kolor akordów</div>
+        <Input
+          type="color"
+          value={chordColor}
+          onChange={(e) => setChordColor(e.target.value)}
+          className="h-10 w-12 p-1"
+          title="Kolor akordów"
+        />
+      </div>
+    </div>
+  ) : null;
+
   const HeaderBlock = (
     <div className="space-y-2">
       <h1 className="text-2xl font-semibold">
         {loading ? "Ładowanie…" : data?.title ?? "Nie znaleziono utworu"}
       </h1>
+      {isMobile ? 
+              <div className="inline-flex items-center justify-center w-full">
+                <hr className="w-full h-px my-3 bg-gray-100/10 border-0"/>
+                <span className="absolute left-7 opacity-50 font-light italic">tekst</span>
+              </div> 
+                : "" 
+            /* separator on mobile */
+            }
+      <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-2 justify-start w-full md:w-auto">
+          <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setFontStep((v) => clamp(v - 1, -6, 10))}>
+            A-
+          </Button>
+          <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setFontStep((v) => clamp(v + 1, -6, 10))}>
+            A+
+          </Button>
+          <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setFontStep(0)} disabled={fontStep === 0}>
+            <RotateCcw className="mr-2 h-4 w-4" /> Reset
+          </Button>
+        </div>
+            
+        <div className="flex flex-wrap items-center gap-2">
+          {isMobile ? 
+            <div className="inline-flex items-center justify-center w-full">
+              <hr className="w-full h-px my-3 bg-gray-100/10 border-0"/>
+              <span className="absolute left-7 opacity-50 font-light italic">transpozycja</span>
+            </div> 
+              : "" 
+          /* separator on mobile */
+          }
+          {effectiveMode === "both" || effectiveMode === "chords" ? TransposeControls : ""}
+          {isMobile ? 
+            <div className="inline-flex items-center justify-center w-full">
+              <hr className="w-full h-px my-3 bg-gray-100/10 border-0"/>
+              <span className="absolute left-7 opacity-50 font-light italic">akordy</span>
+            </div> 
+              : "" 
+          /* separator on mobile */
+          } 
+          {effectiveMode === "both" || effectiveMode === "chords" ? AppearanceControls : ""}
+        </div>
+      </div>
 
       <div className="flex flex-wrap gap-2">
         <Badge variant="outline">{songId}</Badge>
@@ -505,60 +599,8 @@ export default function SongViewClient({ songId }: { songId: string }) {
     </div>
   );
 
-  const TransposeControls = canChordModes ? (
-    <div className="flex flex-wrap items-center gap-2">
-      <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setTranspose((t) => Math.max(-12, t - 1))}>
-        -1
-      </Button>
-      <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setTranspose((t) => Math.min(12, t + 1))}>
-        +1
-      </Button>
-      <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setTranspose(0)} disabled={transpose === 0}>
-        Reset
-      </Button>
-      <Badge variant="outline" className="ml-1">
-        {transpose === 0 ? "Transpozycja: 0" : `Transpozycja: ${transpose > 0 ? "+" : ""}${transpose}`}
-      </Badge>
-    </div>
-  ) : null;
-
-  const AppearanceControls = canChordModes ? (
-    <div className="flex flex-wrap items-center gap-2">
-      <Button
-        variant={chordLayout === "above" ? "default" : "outline"}
-        className="opacity-90 hover:opacity-100"
-        onClick={() => setChordLayout("above")}
-        title="Akordy nad tekstem"
-      >
-        <ArrowUpDown className="mr-2 h-4 w-4" /> Nad tekstem
-      </Button>
-      <Button
-        variant={chordLayout === "inline" ? "default" : "outline"}
-        className="opacity-90 hover:opacity-100"
-        onClick={() => setChordLayout("inline")}
-        title="Akordy w tekście"
-      >
-        <Music className="mr-2 h-4 w-4" /> W tekście
-      </Button>
-
-      <div className="mx-2 h-6 w-px bg-border" />
-
-      <div className="flex items-center gap-2">
-        <Paintbrush className="h-4 w-4 text-muted-foreground" />
-        <div className="text-sm text-muted-foreground">Kolor akordów</div>
-        <Input
-          type="color"
-          value={chordColor}
-          onChange={(e) => setChordColor(e.target.value)}
-          className="h-10 w-12 p-1"
-          title="Kolor akordów"
-        />
-      </div>
-    </div>
-  ) : null;
-
   const Controls = (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-2">
       <Button asChild variant="outline" className="opacity-90 hover:opacity-100">
         <Link href="/spiewnik">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -613,17 +655,6 @@ export default function SongViewClient({ songId }: { songId: string }) {
         <Music className="mr-2 h-4 w-4" /> Akordy
       </Button>
 
-      <div className="mx-2 h-6 w-px bg-border" />
-
-      <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setFontStep((v) => clamp(v - 1, -6, 10))}>
-        A-
-      </Button>
-      <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setFontStep((v) => clamp(v + 1, -6, 10))}>
-        A+
-      </Button>
-      <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={() => setFontStep(0)} disabled={fontStep === 0}>
-        <RotateCcw className="mr-2 h-4 w-4" /> Reset
-      </Button>
     </div>
   );
 
@@ -1029,8 +1060,7 @@ export default function SongViewClient({ songId }: { songId: string }) {
             </>
           )}
 
-          {TransposeControls}
-          {AppearanceControls}
+       
 
           {allText ? renderAllText() : renderSectionSingle()}
 
