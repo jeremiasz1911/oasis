@@ -526,7 +526,7 @@ export default function SongViewClient({ songId }: { songId: string }) {
         </div>
             
         <div className="flex flex-wrap items-center gap-2">
-          {isMobile ? 
+          {isMobile && effectiveMode === "both" || effectiveMode === "chords" ? 
             <div className="inline-flex items-center justify-center w-full">
               <hr className="w-full h-px my-3 bg-gray-100/10 border-0"/>
               <span className="absolute left-7 opacity-50 font-light italic">transpozycja</span>
@@ -535,7 +535,7 @@ export default function SongViewClient({ songId }: { songId: string }) {
           /* separator on mobile */
           }
           {effectiveMode === "both" || effectiveMode === "chords" ? TransposeControls : ""}
-          {isMobile ? 
+          {isMobile && effectiveMode === "both" || effectiveMode === "chords"? 
             <div className="inline-flex items-center justify-center w-full">
               <hr className="w-full h-px my-3 bg-gray-100/10 border-0"/>
               <span className="absolute left-7 opacity-50 font-light italic">akordy</span>

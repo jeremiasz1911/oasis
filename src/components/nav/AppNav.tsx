@@ -106,15 +106,7 @@ export default function AppNav() {
               </SheetHeader>
 
               <div className="mt-4 flex flex-col gap-2">
-                <Link
-                href="/admin/login"
-                className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm hover:bg-muted/40"
-                >
-                    <span className="flex items-center gap-2">
-                        <LogInIcon className="h-4 w-4" />
-                        Zaloguj
-                    </span>
-                </Link>
+               
                 {navItems.map(({ label, href, Icon, enabled }) => {
                   const active = pathname === href || (href !== "/" && pathname?.startsWith(href));
                   return enabled ? (
@@ -145,6 +137,18 @@ export default function AppNav() {
                     </div>
                   );
                 })}
+                <Link
+                  href="/admin/login"
+                  className="flex items-center justify-between rounded-lg border px-3 py-2 mt-6 text-sm hover:bg-muted/40"
+                >
+                    <span className="flex items-center gap-2">
+                        <LogInIcon className="h-4 w-4" />
+                        Zaloguj
+                    </span>
+                </Link>
+                 <Button variant="outline" className="opacity-90 hover:opacity-100" onClick={toggleTheme} title="Przełącz motyw">
+                  {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </Button>
               </div>
             </SheetContent>
           </Sheet>
