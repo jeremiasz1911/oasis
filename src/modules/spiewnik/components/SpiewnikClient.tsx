@@ -26,6 +26,14 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
+// ✅ DODAJ
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 type MatchMode = "or" | "and";
 
 function useDebounced<T>(value: T, ms: number) {
@@ -70,6 +78,9 @@ export default function SpiewnikClient() {
   const params = useSearchParams();
 
   const { items: categories, loading: catsLoading, labelFor } = useSongCategories();
+
+  // ✅ NOWE: modal na mobile
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // URL -> state
   const [query, setQuery] = useState(params.get("q") ?? "");
@@ -184,113 +195,154 @@ export default function SpiewnikClient() {
     setMatch("or");
   };
 
-  return (
-    <div className="mt-6 grid gap-6 md:grid-cols-[300px_1fr]">
-      {/* SIDEBAR */}
-      <aside className="md:sticky md:top-6">
-        <Card className="overflow-hidden">
-          <CardContent className="p-4 space-y-4">
-            <div className="flex items-center gap-2">
-              <Layers className="h-4 w-4 text-muted-foreground" />
-              <div className="text-sm font-medium">Filtry</div>
-              <div className="ml-auto">
-                <Button size="sm" variant="ghost" onClick={clearFilters} disabled={!cats.length && !uncat && !query}>
-                  <X className="mr-2 h-4 w-4" />
-                  Wyczyść
+  // ✅ WYCIĄGNIĘTY PANEL FILTRÓW (używany w aside + w modalu)
+  const FiltersPanel = ({ inModal }: { inModal?: boolean }) => (
+    <Card className={cn("overflow-hidden", inModal && "border-0 rounded-none shadow-none")}>
+      <CardContent className={cn("p-4 space-y-4", inModal && "pb-28")}>
+        <div className="flex items-center gap-2">
+          <Layers className="h-4 w-4 text-muted-foreground" />
+          <div className="text-sm font-medium">Filtry</div>
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={clearFilters}
+              disabled={!cats.length && !uncat && !query}
+            >
+              <X className="mr-2 h-4 w-4" />
+              Wyczyść
+            </Button>
+
+            {inModal ? (
+              <Button size="sm" variant="default" onClick={() => setFiltersOpen(false)}>
+                Zastosuj
+              </Button>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            type="button"
+            variant={match === "or" ? "default" : "outline"}
+            onClick={() => setMatch("or")}
+            className="justify-center"
+            title="Utwór pasuje, gdy ma którąkolwiek kategorię"
+          >
+            lub
+          </Button>
+          <Button
+            type="button"
+            variant={match === "and" ? "default" : "outline"}
+            onClick={() => setMatch("and")}
+            className="justify-center"
+            title="Utwór pasuje, gdy ma wszystkie kategorie"
+          >
+            również
+          </Button>
+        </div>
+
+        <button
+          type="button"
+          className={cn(
+            "flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition-colors",
+            uncat ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted/40"
+          )}
+          onClick={() => {
+            setUncat((v) => !v);
+            setCats([]);
+          }}
+        >
+          <span className="flex items-center gap-2">
+            {uncat ? (
+              <CheckCircle2 className="h-4 w-4" />
+            ) : (
+              <Circle className="h-4 w-4 text-muted-foreground" />
+            )}
+            Bez kategorii
+          </span>
+          <span className={cn("text-xs", uncat ? "opacity-90" : "text-muted-foreground")}>
+            {counts.get("__uncat__") ?? 0}
+          </span>
+        </button>
+
+        <div className="h-px bg-border" />
+
+        <div className="flex items-center gap-2 text-sm font-medium">
+          <Tag className="h-4 w-4 text-muted-foreground" />
+          Kategorie
+        </div>
+
+        <div className={cn(inModal ? "max-h-[calc(100vh-260px)]" : "max-h-[55vh]", "overflow-auto pr-1")}>
+          {catsLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          ) : categories.length ? (
+            <div className="space-y-2">
+              {categories.map((c) => {
+                const checked = cats.includes(c.id);
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => toggleCat(c.id)}
+                    className={cn(
+                      "flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition-all",
+                      checked
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background hover:bg-muted/40"
+                    )}
+                  >
+                    <span className="truncate flex items-center gap-2">
+                      {checked ? (
+                        <CheckCircle2 className="h-4 w-4" />
+                      ) : (
+                        <Circle className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      {c.name}
+                    </span>
+                    <span className={cn("ml-2 text-xs", checked ? "opacity-90" : "text-muted-foreground")}>
+                      {counts.get(c.id) ?? 0}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground">
+              Brak kategorii. Dodaj je w <span className="font-medium">/admin/categories</span>.
+            </div>
+          )}
+        </div>
+
+        {/* ✅ sticky dolny pasek w modalu */}
+        {inModal ? (
+          <div className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur px-4 py-3">
+            <div className="mx-auto flex max-w-[800px] items-center gap-2">
+              <div className="text-sm text-muted-foreground">
+                Wyniki: <span className="font-medium text-foreground">{loading ? "…" : filteredSongs.length}</span>
+              </div>
+              <div className="ml-auto flex gap-2">
+                <Button variant="outline" onClick={() => setFiltersOpen(false)}>
+                  Zamknij
                 </Button>
+                <Button onClick={() => setFiltersOpen(false)}>Zastosuj</Button>
               </div>
             </div>
+          </div>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
 
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                type="button"
-                variant={match === "or" ? "default" : "outline"}
-                onClick={() => setMatch("or")}
-                className="justify-center"
-                title="Utwór pasuje, gdy ma którąkolwiek kategorię"
-              >
-                lub
-              </Button>
-              <Button
-                type="button"
-                variant={match === "and" ? "default" : "outline"}
-                onClick={() => setMatch("and")}
-                className="justify-center"
-                title="Utwór pasuje, gdy ma wszystkie kategorie"
-              >
-                również
-              </Button>
-            </div>
-
-            <button
-              type="button"
-              className={cn(
-                "flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition-colors",
-                uncat ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted/40"
-              )}
-              onClick={() => {
-                setUncat((v) => !v);
-                setCats([]);
-              }}
-            >
-              <span className="flex items-center gap-2">
-                {uncat ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4 text-muted-foreground" />}
-                Bez kategorii
-              </span>
-              <span className={cn("text-xs", uncat ? "opacity-90" : "text-muted-foreground")}>
-                {counts.get("__uncat__") ?? 0}
-              </span>
-            </button>
-
-            <div className="h-px bg-border" />
-
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <Tag className="h-4 w-4 text-muted-foreground" />
-              Kategorie
-            </div>
-
-            <div className="max-h-[55vh] overflow-auto pr-1">
-              {catsLoading ? (
-                <div className="space-y-2">
-                  <Skeleton className="h-8 w-full" />
-                  <Skeleton className="h-8 w-full" />
-                  <Skeleton className="h-8 w-full" />
-                </div>
-              ) : categories.length ? (
-                <div className="space-y-2">
-                  {categories.map((c) => {
-                    const checked = cats.includes(c.id);
-                    return (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => toggleCat(c.id)}
-                        className={cn(
-                          "flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition-all",
-                          checked
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "bg-background hover:bg-muted/40"
-                        )}
-                      >
-                        <span className="truncate flex items-center gap-2">
-                          {checked ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4 text-muted-foreground" />}
-                          {c.name}
-                        </span>
-                        <span className={cn("ml-2 text-xs", checked ? "opacity-90" : "text-muted-foreground")}>
-                          {counts.get(c.id) ?? 0}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-sm text-muted-foreground">
-                  Brak kategorii. Dodaj je w <span className="font-medium">/admin/categories</span>.
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+  return (
+    <div className="mt-6 grid gap-6 md:grid-cols-[300px_1fr]">
+      {/* ✅ SIDEBAR tylko na md+ */}
+      <aside className="hidden md:block md:sticky md:top-6">
+        <FiltersPanel />
       </aside>
 
       {/* MAIN */}
@@ -309,6 +361,18 @@ export default function SpiewnikClient() {
                 />
               </div>
 
+              {/* ✅ PRZYCISK FILTRY na mobile */}
+              <Button
+                type="button"
+                variant="outline"
+                className="md:hidden h-12 px-3"
+                onClick={() => setFiltersOpen(true)}
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                Filtry
+              </Button>
+
+              {/* desktop info */}
               <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
                 <Filter className="h-4 w-4" />
                 <span>{match.toUpperCase()}</span>
@@ -356,6 +420,26 @@ export default function SpiewnikClient() {
             </div>
           </CardContent>
         </Card>
+
+        {/* ✅ MODAL FILTRÓW NA MOBILE */}
+        <Dialog open={filtersOpen} onOpenChange={setFiltersOpen}>
+          <DialogContent className="w-[100vw] h-[100vh] max-w-none rounded-none p-0">
+            <DialogHeader className="px-4 py-3 border-b">
+              <div className="flex items-center">
+                <DialogTitle className="text-base">Filtry</DialogTitle>
+                <Button variant="ghost" size="icon" className="ml-auto" onClick={() => setFiltersOpen(false)}>
+                  {/* <X className="h-5 w-5" /> */}
+                </Button>
+              </div>
+            </DialogHeader>
+
+            <div className="h-[calc(100vh-56px)] overflow-auto">
+              <div className="p-0">
+                <FiltersPanel inModal />
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* LIST */}
         <Card>
